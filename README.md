@@ -3,7 +3,9 @@
 一个**单文件、零依赖、离线可用**的进藏交通价格分析页面。飞机 / 火车 / 空铁联运
 10 条主流方案的价格、时长、性价比放在一起对比，并给出未来 90 天的价格走势。
 
-用浏览器直接打开 `index.html` 即可，不需要服务器、不需要联网、不需要构建。
+**在线预览** → <https://oasisdragon.github.io/tibet-transport-price/>
+
+也可以直接下载后用浏览器打开 `index.html`，不需要服务器、不需要联网、不需要构建。
 
 ![长图预览](assets/route-price-long.png)
 
@@ -67,6 +69,7 @@ npm test
 
 ```
 index.html              页面本体（HTML + CSS + JS 全在一个文件里）
+.nojekyll               让 GitHub Pages 跳过 Jekyll 处理
 assets/
   route-price-long.png  长图版（微信 / 朋友圈分享用）
 tests/
@@ -76,6 +79,17 @@ tools/
   mkshot.js             生成长图专用的页面副本（冻结定时器、去掉地图 CDN）
   shot.js               量高 + 精确截图，输出到 assets/
 ```
+
+---
+
+## 部署
+
+页面是纯静态单文件，任何静态托管都能直接跑。仓库已开启 GitHub Pages，
+从 `main` 分支根目录发布：
+
+<https://oasisdragon.github.io/tibet-transport-price/>
+
+推送到 `main` 后会自动重新构建，通常 30 秒左右生效。
 
 ---
 
