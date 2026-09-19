@@ -156,3 +156,9 @@ r.target = roundPrice(clamp(targetPriceOf(r, travelDate, now) * k, r.range[0], r
 
 页面默认不联网、不抓取任何第三方数据。想接真实数据，
 点右上「数据源设置」填入自己的接口地址即可，接口返回格式见页面内提示。
+
+---
+
+## 许可证
+
+[MIT](LICENSE) © 2026 oasisDRAGON
