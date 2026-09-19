@@ -1,0 +1,6 @@
+# 统一用 LF，避免跨平台换行符差异把整个文件标成改动
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.ico binary

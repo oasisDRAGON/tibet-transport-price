@@ -1,0 +1,26 @@
+# 依赖
+node_modules/
+
+# 测试运行时从 index.html 抽取的纯函数块，自动生成
+_extracted.js
+
+# 长图工具的中间产物
+tools/_shot.html
+
+# WorkBuddy 工具的本地数据（含工作日志），不入库
+.workbuddy-ai/
+
+# Chrome headless 的临时用户目录
+_cdp_*/
+
+# 探针与截图的中间产物
+_chk_*.html
+_chk_*.png
+_probe_*.html
+_posdom.txt
+_shotdom.txt
+
+# 早期发布尝试留下的旧副本，已被 index.html 取代
+shanghai-lhasa/
+
+*.log

@@ -1,0 +1,16 @@
+{
+  "name": "tibet-transport-price",
+  "version": "1.0.0",
+  "private": true,
+  "description": "上海 → 拉萨进藏交通价格看板：单文件离线页面 + 可测试的价格引擎",
+  "keywords": ["tibet", "lhasa", "transport", "price", "dashboard", "offline"],
+  "scripts": {
+    "test": "node tests/engine.test.js && node tests/ui.test.js",
+    "test:engine": "node tests/engine.test.js",
+    "test:ui": "node tests/ui.test.js",
+    "shot": "node tools/mkshot.js && node tools/shot.js"
+  },
+  "devDependencies": {
+    "jsdom": "^30.1.0"
+  }
+}
