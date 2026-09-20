@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>上海 → 拉萨 · 进藏交通价格看板</title>
+<title>上海 ⇄ 拉萨 · 进藏 / 出藏交通价格看板</title>
 <script type="text/javascript">
   window._TMapSecurityConfig = {
     serviceHost: 'http://127.0.0.1:__WB_HTTP_PORT__/_TMapService/_wbt/__WB_TMAP_SECRET__',
@@ -1427,6 +1427,7 @@ function initRoutes(){
    提示卡、数据源抽屉里的 id 列表都跟着变。集中在这里改，避免漏改。 */
 function applyDirection(){
   var d = P.directionOf(state.direction);
+  document.title = d.from + ' → ' + d.to + ' · ' + d.kind + '交通价格看板';   // 标签页也跟着走
   var t = $('#heroTitle');
   if(t) t.innerHTML = d.from + ' <span class="arrow">→</span> ' + d.to + ' · ' + d.kind + '交通价格看板';
   var sub = $('#heroSub');    if(sub) sub.textContent = d.sub;

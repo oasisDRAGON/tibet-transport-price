@@ -429,6 +429,8 @@ function step(fn) { return new Promise(r => window.setTimeout(() => { fn(); r();
     ok(!!$('#dirSeg'), '应存在「行程方向」分段控件');
     ok($$('#dirSeg button').length === 2, '方向控件应有 2 个按钮');
     ok($('#dirSeg button.on').dataset.v === 'out', '默认应选中去程');
+    ok(doc.title === '上海 → 拉萨 · 进藏交通价格看板',
+       '初始标签页标题应为去程，实际 ' + doc.title);
 
     // 去程基线
     const outTitle = $('#heroTitle').textContent.trim();
@@ -456,6 +458,11 @@ function step(fn) { return new Promise(r => window.setTimeout(() => { fn(); r();
        '返程标题应含 拉萨 / 上海 / 出藏，实际 ' + backTitle);
     ok(backTitle.indexOf('拉萨') < backTitle.indexOf('上海'),
        '返程标题里拉萨应排在上海前面，实际 ' + backTitle);
+
+    ok(doc.title.includes('拉萨') && doc.title.includes('出藏'),
+       '返程标签页标题应含 拉萨 / 出藏，实际 ' + doc.title);
+    ok(doc.title.indexOf('拉萨') < doc.title.indexOf('上海'),
+       '返程标签页标题里拉萨应排在上海前面，实际 ' + doc.title);
 
     ok($('#mapTitle').textContent === '出藏走廊示意', '返程地图标题应为「出藏走廊示意」');
     ok($('#tipsTitle').textContent === '出藏出行提示', '返程提示标题应为「出藏出行提示」');
@@ -511,6 +518,7 @@ function step(fn) { return new Promise(r => window.setTimeout(() => { fn(); r();
     ok($('#dirSeg button.on').dataset.v === 'out', '切回后去程按钮应高亮');
     ok($('#heroTitle').textContent.includes('进藏'), '切回后标题应回到进藏');
     ok($('#mapTitle').textContent === '进藏走廊示意', '切回后地图标题应还原');
+    ok(doc.title.includes('进藏'), '切回后标签页标题应回到进藏，实际 ' + doc.title);
     ok($('#footRailPair').textContent.includes('Z164'), '切回后页脚应还原为 Z164');
     ok(window.__SL.state.routes.map(r => r.id).join(',') === outIds, '切回后方案 id 应完全还原');
     ok($$('#cards .card').length === 10, '切回后卡片仍为 10 张');
