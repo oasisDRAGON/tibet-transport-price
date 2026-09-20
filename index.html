@@ -392,9 +392,9 @@
 <header class="hero">
   <div class="hero-inner">
     <div>
-      <h1>上海 <span class="arrow">→</span> 拉萨 · 进藏交通价格看板</h1>
-      <p class="sub">飞机 / 火车 / 空铁联运 全通道价格 · 时长 · 性价比实时对比</p>
-      <div class="chips">
+      <h1 id="heroTitle">上海 <span class="arrow">→</span> 拉萨 · 进藏交通价格看板</h1>
+      <p class="sub" id="heroSub">飞机 / 火车 / 空铁联运 全通道价格 · 时长 · 性价比实时对比</p>
+      <div class="chips" id="heroChips">
         <span class="chip">全程 4372 km（铁路）</span>
         <span class="chip">海拔 4 m → 3650 m</span>
         <span class="chip">10 条主流方案</span>
@@ -414,6 +414,13 @@
 
   <!-- controls -->
   <section class="panel controls">
+    <div class="ctrl">
+      <label title="切换去程（上海 → 拉萨）与返程（拉萨 → 上海）">行程方向</label>
+      <div class="seg" id="dirSeg">
+        <button data-v="out" class="on" title="上海 → 拉萨">去程</button>
+        <button data-v="back" title="拉萨 → 上海">返程</button>
+      </div>
+    </div>
     <div class="ctrl">
       <label for="travelDate">出行日期</label>
       <input type="date" id="travelDate">
@@ -495,13 +502,13 @@
   <!-- chart + map -->
   <section class="panel">
     <div class="panel-hd">
-      <h2>进藏走廊示意</h2>
+      <h2 id="mapTitle">进藏走廊示意</h2>
       <div class="hint" id="mapHint">腾讯地图</div>
     </div>
     <div class="panel-bd">
       <div id="mapFallback"></div>
       <div id="map" style="display:none"></div>
-      <div class="map-note">三条主流走廊：<b>沪—蓉—拉</b>（中转性价比最高）、<b>沪—西宁—拉</b>（空铁联运，海拔渐进适应）、<b>沪—拉直达铁路</b>（4372 km，45 小时）。</div>
+      <div class="map-note" id="mapNote">三条主流走廊：<b>沪—蓉—拉</b>（中转性价比最高）、<b>沪—西宁—拉</b>（空铁联运，海拔渐进适应）、<b>沪—拉直达铁路</b>（4372 km，45 小时）。</div>
     </div>
   </section>
 
@@ -534,7 +541,7 @@
 
   <!-- tips -->
   <section class="panel">
-    <div class="panel-hd"><h2>进藏出行提示</h2><div class="hint">基于 2026 年 9 月行情</div></div>
+    <div class="panel-hd"><h2 id="tipsTitle">进藏出行提示</h2><div class="hint" id="tipsHint">基于 2026 年 9 月行情</div></div>
     <div class="panel-bd">
       <div class="tips" id="tips"></div>
     </div>
@@ -542,9 +549,9 @@
 
   <footer>
     <b>数据说明：</b>机票价格随舱位库存实时浮动，本页默认由内置行情引擎按「季节 × 星期 × 提前预订天数 × 库存波动」模型推算，用于展示价格结构与变化趋势，<b>不构成购票依据</b>。
-    火车票价为铁路部门公布全价（Z164/Z165 上海—拉萨：硬座 402.5 / 硬卧上中下 793.5·817.5·841.5 / 软卧上 1262.5·下 1310.5 元），铁路实行浮动票价制，实际以 12306 当日执行价为准。
+    火车票价为铁路部门公布全价（<span id="footRailPair">Z164/Z165 上海—拉萨</span>：硬座 402.5 / 硬卧上中下 793.5·817.5·841.5 / 软卧上 1262.5·下 1310.5 元），铁路实行浮动票价制，实际以 12306 当日执行价为准。
     航班时刻与班期参考东航、西藏航空 2026 年公开信息；燃油附加费自 2026 年 8 月 5 日起 800 公里以上航段降至 70 元/人/航段。
-    <b>班次时刻与折扣系数：</b>单一航班方案（浦东直飞、虹桥经停西安 / 成都）与 Z164 采用公开班期；经成都 / 经重庆中转、飞西宁 + 火车属于「每天多班」，此处按上海段 × 进藏段的代表性组合建模，红眼班次的低价系数为经验估值，<b>仅用于演示时段筛选逻辑，实际班次与价格以购票平台为准</b>。
+    <b>班次时刻与折扣系数：</b>单一航班方案（浦东直飞、虹桥经停西安 / 成都）与 <span id="footRailTrain">Z164</span> 采用公开班期；经成都 / 经重庆中转、飞西宁 + 火车属于「每天多班」，此处按<span id="footRailLeg">上海段 × 进藏段</span>的代表性组合建模，红眼班次的低价系数为经验估值，<b>仅用于演示时段筛选逻辑，实际班次与价格以购票平台为准</b>。
     点击右上「数据源设置」可接入你自己的价格接口，实现真正的实时取价。
   </footer>
 </div>
@@ -575,7 +582,7 @@
   { "id": "air-direct", "price": 1680 },
   { "id": "air-ct-transfer", "price": 1180 }
 ]</pre>
-        <div class="desc" style="margin-top:8px">
+        <div class="desc" style="margin-top:8px" id="srcIds">
           方案 id：<code>air-direct</code> <code>air-xian</code> <code>air-chengdu</code>
           <code>air-ct-transfer</code> <code>air-cq-transfer</code> <code>air-xn-rail</code>
           <code>train-z164-soft</code> <code>train-z164-hard</code> <code>train-z164-seat</code>
@@ -752,6 +759,209 @@ var ROUTES = [
     cons:['比直达多花 8 小时','总价还比直达贵约 144 元','需要换乘，衔接风险高']
   }
 ];
+
+/* ------------------------------------------------------------------
+   返程（拉萨 → 上海）方案。和去程分开建模，而不是把去程数据「倒过来」，
+   原因有两个：
+
+   1. 拉萨贡嘎机场午后风力增大、航班准点率明显下降，出港航班集中在上午。
+      把去程时刻简单反转会得到一堆下午 / 傍晚起飞的班次，与真实情况不符。
+   2. 离藏需求集中，返程票价普遍比去程高一档，区间也不同。
+
+   班次时刻与折扣系数的口径同去程：仅用于演示时段筛选逻辑。
+   ------------------------------------------------------------------ */
+var ROUTES_BACK = [
+  {
+    id:'air-direct-back', mode:'flight', badge:'唯一直飞',
+    name:'贡嘎直飞浦东', carrier:'中国东方航空 MU', aircraft:'空客 A330 宽体机',
+    path:'拉萨贡嘎 LXA → 上海浦东 PVG',
+    schedule:'每周二 / 四 / 六',
+    clock:'上午班 · 直飞',
+    slots:[ { dep:620, arr:990, k:1.00, tag:'上午班' } ],           // 10:20 起飞 → 16:30 抵达
+    durationMin:370, basePrice:1750, range:[1450,3700], unit:'经济舱含税',
+    stops:'直飞', adapt:1, comfort:5,
+    note:'拉萨出港航班集中在上午 —— 贡嘎机场午后风力增大、准点率下降，返程尽量订上午班。',
+    pros:['全程最短，仅 6 小时 10 分','上午起飞，落地上海还是傍晚','A330 宽体机，座位更宽'],
+    cons:['班期只有周二 / 四 / 六','离藏需求集中，返程票价通常比去程高一档']
+  },
+  {
+    id:'air-xian-back', mode:'flight', badge:'每天一班',
+    name:'贡嘎经停西安', carrier:'中国东方航空 MU2336', aircraft:'空客 A319',
+    path:'拉萨贡嘎 LXA → 西安 → 上海虹桥 SHA',
+    schedule:'每天',
+    clock:'08:50 起飞 · 16:30 抵达 · 经停 2 小时',
+    slots:[ { dep:530, arr:990, k:1.00, tag:'早班' } ],             // 08:50 起飞 → 16:30 抵达
+    durationMin:460, basePrice:1560, range:[1350,3300], unit:'经济舱含税',
+    stops:'经停 1 站', adapt:2, comfort:3,
+    note:'返程经停西安，行李可直挂上海，中途无需提取。',
+    pros:['每天都有航班，日期灵活','价格通常低于直飞','上午起飞，当天就能到上海'],
+    cons:['总耗时 7 小时 40 分','经停段为窄体机 A319，舒适度一般']
+  },
+  {
+    id:'air-chengdu-back', mode:'flight', badge:'每天一班',
+    name:'贡嘎经停成都', carrier:'西藏航空 TV9881', aircraft:'空客 A330 宽体机',
+    path:'拉萨贡嘎 LXA → 成都 → 上海虹桥 SHA',
+    schedule:'每天',
+    clock:'09:40 起飞 · 16:55 抵达 · 经停 1 小时 20 分',
+    slots:[ { dep:580, arr:1015, k:1.00, tag:'上午班' } ],          // 09:40 起飞 → 16:55 抵达
+    durationMin:435, basePrice:1600, range:[1380,3400], unit:'经济舱含税',
+    stops:'经停 1 站', adapt:2, comfort:4,
+    note:'藏航在成都枢纽的返程衔接班次最多，改签余地比直飞大得多。',
+    pros:['每天一班，宽体机执飞','成都中转选择最多，改签灵活','上午出发，当天傍晚到上海'],
+    cons:['经停时间偏短，衔接略紧凑','旺季返程票比去程更紧张']
+  },
+  {
+    id:'air-ct-transfer-back', mode:'flight', badge:'性价比之王',
+    name:'经成都中转（分段购票）', carrier:'拉萨 → 成都天府 + 成都天府 → 上海', aircraft:'两段独立出票',
+    path:'拉萨贡嘎 LXA → 成都天府 TFU → 上海',
+    schedule:'每天多班',
+    clock:'总耗时 8–11 小时（含中转等待）',
+    slots:[                                                          // 拉萨段 × 成都段 的代表性组合
+      { dep:520, arr:1050, k:1.08, tag:'早班衔接' },                 // 08:40 起飞 → 17:30 抵达
+      { dep:660, arr:1200, k:1.00, tag:'上午衔接' },                 // 11:00 起飞 → 20:00 抵达
+      { dep:810, arr:1380, k:0.92, tag:'午后衔接' },                 // 13:30 起飞 → 23:00 抵达
+      { dep:960, arr:1560, k:0.84, tag:'晚班衔接' }                  // 16:00 起飞 → 次日 02:00 抵达
+    ],
+    durationMin:530, basePrice:1210, range:[950,1700], unit:'两段含税合计',
+    stops:'中转 1 次', adapt:2, comfort:3,
+    note:'拉萨飞成都每天 10 班以上，是返程最容易拼到特价的通道。',
+    pros:['价格通常只有直飞的一半','成都回上海每天班次密集','可以顺路在成都停留游玩'],
+    cons:['两段票不联程，前段延误后段不保','需自行在成都提取行李重新托运','总耗时比直飞多 2–4 小时']
+  },
+  {
+    id:'air-cq-transfer-back', mode:'flight', badge:'总价最低',
+    name:'经重庆中转', carrier:'拉萨 → 重庆江北 + 重庆江北 → 上海', aircraft:'两段独立出票',
+    path:'拉萨贡嘎 LXA → 重庆江北 CKG → 上海',
+    schedule:'每天多班',
+    clock:'总耗时 8–11 小时（含中转等待）',
+    slots:[                                                          // 拉萨段 × 重庆段 的代表性组合
+      { dep:545, arr:1080, k:1.06, tag:'早班衔接' },                 // 09:05 起飞 → 18:00 抵达
+      { dep:690, arr:1230, k:1.00, tag:'上午衔接' },                 // 11:30 起飞 → 20:30 抵达
+      { dep:840, arr:1410, k:0.93, tag:'午后衔接' },                 // 14:00 起飞 → 23:30 抵达
+      { dep:990, arr:1590, k:0.84, tag:'晚班衔接' }                  // 16:30 起飞 → 次日 02:30 抵达
+    ],
+    durationMin:520, basePrice:1080, range:[850,1550], unit:'两段含税合计',
+    stops:'中转 1 次', adapt:2, comfort:3,
+    note:'重庆回上海的折扣票最多，是返程总价最低的空中方案。',
+    pros:['重庆段折扣多，总价最低','可顺路在重庆停留游玩'],
+    cons:['拉萨飞重庆航班量比成都少约三成','旺季需提前 2–3 天锁票']
+  },
+  {
+    id:'air-xn-rail-back', mode:'combo', badge:'渐进下降海拔',
+    name:'火车出藏 + 西宁飞上海', carrier:'拉萨 → 西宁（Z166 等）+ 西宁曹家堡 → 上海', aircraft:'青藏铁路 + 空客 A320',
+    path:'拉萨站 → 西宁站 → 西宁曹家堡 XNN → 上海',
+    schedule:'每天',
+    clock:'火车约 21 小时 + 飞机约 3 小时，合计约 27 小时',
+    slots:[                                                          // Z166 拉萨 → 西宁 × 西宁 → 上海 航班
+      { dep:765, arr:2380, k:1.06, tag:'火车 + 午后航班' },          // 12:45 发车 → 次日 15:40 抵达
+      { dep:765, arr:2740, k:1.00, tag:'火车 + 晚班航班' }           // 12:45 发车 → 次日 21:40 抵达
+    ],
+    durationMin:1615, basePrice:1210, range:[1080,1400], unit:'火车硬卧 + 机票合计',
+    stops:'空铁联运', adapt:5, comfort:3,
+    note:'先坐火车离开高原，海拔逐步下降（拉萨 3650 m → 西宁 2260 m → 上海 4 m），身体过渡比直接飞回更平缓。',
+    pros:['海拔逐步下降，身体过渡更平缓','白天穿越可可西里，风景好','价格介于机票与直达火车之间'],
+    cons:['总耗时约 27 小时','西宁需要换站，衔接要留足时间','出藏段火车票同样需要抢']
+  },
+  {
+    id:'train-z166-soft', mode:'train', badge:'最舒适火车',
+    name:'Z166 直达 · 软卧下铺', carrier:'中国铁路 Z166 / Z163', aircraft:'25T 型客车',
+    path:'拉萨站 → 上海站',
+    schedule:'每天 12:45 始发',
+    clock:'12:45 发车 · 第三日 09:48 抵达',
+    slots:[ { dep:765, arr:3468, k:1.00, tag:'每日一班' } ],        // 12:45 发车 → 第三日 09:48 抵达
+    durationMin:2703, basePrice:1310.5, range:[1310.5,1310.5], unit:'铁路公布全价',
+    stops:'直达 · 经停 15 站', adapt:4, comfort:4,
+    note:'与 Z164 对开，全程同为 4372 公里、45 小时 03 分，票价一致。',
+    pros:['4 人包厢带门，私密性最好','白天穿越可可西里，风景最佳','票价固定，不受旺季涨价影响'],
+    cons:['45 小时车程较长','软卧铺位最抢手，需提前抢票','车次每日一班，错过要等次日']
+  },
+  {
+    id:'train-z166-hard', mode:'train', badge:'火车主流选择',
+    name:'Z166 直达 · 硬卧下铺', carrier:'中国铁路 Z166 / Z163', aircraft:'25T 型客车',
+    path:'拉萨站 → 上海站',
+    schedule:'每天 12:45 始发',
+    clock:'12:45 发车 · 第三日 09:48 抵达',
+    slots:[ { dep:765, arr:3468, k:1.00, tag:'每日一班' } ],        // 12:45 发车 → 第三日 09:48 抵达
+    durationMin:2703, basePrice:841.5, range:[841.5,841.5], unit:'铁路公布全价',
+    stops:'直达 · 经停 15 站', adapt:4, comfort:3,
+    note:'硬卧上 / 中 / 下铺分别为 793.5 / 817.5 / 841.5 元，与去程同价。',
+    pros:['价格只有机票的六成','卧铺可以躺平，45 小时不算太难熬','海拔渐进下降，比直飞更稳'],
+    cons:['6 人开放式车厢，噪音和灯光干扰大','旺季放票瞬间售罄，常常只能候补','第三日才能到，占用两个白天']
+  },
+  {
+    id:'train-z166-seat', mode:'train', badge:'极限省钱',
+    name:'Z166 直达 · 硬座', carrier:'中国铁路 Z166 / Z163', aircraft:'25T 型客车',
+    path:'拉萨站 → 上海站',
+    schedule:'每天 12:45 始发',
+    clock:'12:45 发车 · 第三日 09:48 抵达',
+    slots:[ { dep:765, arr:3468, k:1.00, tag:'每日一班' } ],        // 12:45 发车 → 第三日 09:48 抵达
+    durationMin:2703, basePrice:402.5, range:[402.5,402.5], unit:'铁路公布全价',
+    stops:'直达 · 经停 15 站', adapt:4, comfort:1,
+    note:'全程 45 小时坐姿，出藏同样强烈不建议。',
+    pros:['全网最低价，402.5 元出藏'],
+    cons:['45 小时硬座，体力消耗极大','高原上连续熬夜，身体负担更重','不建议单独出行时选择']
+  },
+  {
+    id:'train-transfer-back', mode:'train', badge:'不推荐',
+    name:'火车两段中转（拉萨→西宁→上海）', carrier:'拉萨 → 西宁 + 西宁 → 上海', aircraft:'两段普速列车',
+    path:'拉萨站 → 西宁站 → 上海站',
+    schedule:'每天',
+    clock:'拉萨 → 西宁 21 小时 + 西宁 → 上海 33 小时 23 分',
+    slots:[ { dep:765, arr:3968, k:1.00, tag:'两段衔接' } ],        // 12:45 发车 → 第三日 18:08 抵达
+    durationMin:3203, basePrice:985.5, range:[985.5,985.5], unit:'两段硬卧下铺合计',
+    stops:'中转 1 次', adapt:5, comfort:3,
+    note:'合计 53 小时 23 分、985.5 元，比 Z166 直达又慢又贵，只在直达票售罄时考虑。',
+    pros:['直达票售罄时的备选方案','可在西宁停留，顺路游玩青海湖'],
+    cons:['比直达多花 8 小时','总价还比直达贵约 144 元','需要换乘，衔接风险高']
+  }
+];
+
+/* ------------------------------------------------------------------
+   方向元数据。页面上所有随方向变化的固定文案都收在这里，
+   避免散落在渲染函数里各写一份。
+   ------------------------------------------------------------------ */
+var DIRECTIONS = {
+  out: {
+    key:'out', from:'上海', to:'拉萨', kind:'进藏',
+    title:'上海 → 拉萨 · 进藏交通价格看板',
+    sub:'飞机 / 火车 / 空铁联运 全通道价格 · 时长 · 性价比实时对比',
+    chips:['全程 4372 km（铁路）', '海拔 4 m → 3650 m', '10 条主流方案'],
+    mapTitle:'进藏走廊示意',
+    mapNote:'三条主流走廊：<b>沪—蓉—拉</b>（中转性价比最高）、<b>沪—西宁—拉</b>（空铁联运，海拔渐进适应）、<b>沪—拉直达铁路</b>（4372 km，45 小时）。',
+    tipsTitle:'进藏出行提示',
+    tipsTag:'基于 2026 年 9 月行情',
+    railPair:'Z164/Z165 上海—拉萨',
+    railTrain:'Z164',
+    railLeg:'上海段 × 进藏段'
+  },
+  back: {
+    key:'back', from:'拉萨', to:'上海', kind:'出藏',
+    title:'拉萨 → 上海 · 出藏交通价格看板',
+    sub:'飞机 / 火车 / 空铁联运 全通道价格 · 时长 · 性价比实时对比',
+    chips:['全程 4372 km（铁路）', '海拔 3650 m → 4 m', '10 条主流方案'],
+    mapTitle:'出藏走廊示意',
+    mapNote:'三条主流走廊：<b>拉—蓉—沪</b>（中转性价比最高）、<b>拉—西宁—沪</b>（火车出藏 + 飞机，海拔渐进下降）、<b>拉—沪直达铁路</b>（4372 km，45 小时）。',
+    tipsTitle:'出藏出行提示',
+    tipsTag:'基于 2026 年 9 月行情',
+    railPair:'Z166/Z163 拉萨—上海',
+    railTrain:'Z166',
+    railLeg:'拉萨段 × 回沪段'
+  }
+};
+
+/* 取某个方向的方案列表。默认去程，非法值一律退回去程。 */
+function routesFor(dir){
+  return dir === 'back' ? ROUTES_BACK : ROUTES;
+}
+
+/* 取方向元数据，非法值退回去程。 */
+function directionOf(dir){
+  return DIRECTIONS[dir === 'back' ? 'back' : 'out'];
+}
+
+function isDirection(v){
+  return v === 'out' || v === 'back';
+}
 
 var STOCK_LEVELS = ['充足','有票','紧张','候补'];
 var STOCK_CLASS  = {'充足':0,'有票':1,'紧张':2,'候补':3};
@@ -1103,6 +1313,11 @@ function modeLabel(m){
 
 return {
   ROUTES: ROUTES,
+  ROUTES_BACK: ROUTES_BACK,
+  DIRECTIONS: DIRECTIONS,
+  routesFor: routesFor,
+  directionOf: directionOf,
+  isDirection: isDirection,
   STOCK_LEVELS: STOCK_LEVELS,
   STOCK_CLASS: STOCK_CLASS,
   clamp: clamp,
@@ -1166,6 +1381,7 @@ var CHART_DAYS = 90;
 /* ---------- 状态 ---------- */
 var state = {
   travelDate: null,
+  direction: 'out',               // 'out' = 上海 → 拉萨（去程）；'back' = 拉萨 → 上海（返程）
   mode: 'all',
   sort: 'value',
   targetPrice: null,
@@ -1197,13 +1413,55 @@ function store(key, val){
 
 /* ---------- 初始化 ---------- */
 function initRoutes(){
-  state.routes = P.ROUTES.map(function(r){
+  state.routes = P.routesFor(state.direction).map(function(r){
     var o = {};
     for(var k in r) if(Object.prototype.hasOwnProperty.call(r, k)) o[k] = r[k];
     o.price = P.roundPrice(r.basePrice, r);
     o.stock = r.mode === 'train' ? '紧张' : '有票';
     return o;
   });
+  buildDateSeries();               // 折线图的系列表跟着路线一起换
+}
+
+/* 方向切换要动的不只是路线数据：hero 标题、地图标题与说明、页脚的车次、
+   提示卡、数据源抽屉里的 id 列表都跟着变。集中在这里改，避免漏改。 */
+function applyDirection(){
+  var d = P.directionOf(state.direction);
+  var t = $('#heroTitle');
+  if(t) t.innerHTML = d.from + ' <span class="arrow">→</span> ' + d.to + ' · ' + d.kind + '交通价格看板';
+  var sub = $('#heroSub');    if(sub) sub.textContent = d.sub;
+  var chips = $('#heroChips');
+  if(chips) chips.innerHTML = d.chips.map(function(c){ return '<span class="chip">' + c + '</span>'; }).join('');
+  var mt = $('#mapTitle');    if(mt) mt.textContent = d.mapTitle;
+  var mn = $('#mapNote');     if(mn) mn.innerHTML = d.mapNote;
+  var tt = $('#tipsTitle');   if(tt) tt.textContent = d.tipsTitle;
+  var th = $('#tipsHint');    if(th) th.textContent = d.tipsTag;
+  var fp = $('#footRailPair');  if(fp) fp.textContent = d.railPair;
+  var ft = $('#footRailTrain'); if(ft) ft.textContent = d.railTrain;
+  var fl = $('#footRailLeg');   if(fl) fl.textContent = d.railLeg;
+  var ids = $('#srcIds');
+  if(ids) ids.innerHTML = '方案 id：' + state.routes.map(function(r){
+    return '<code>' + r.id + '</code>';
+  }).join(' ') + '。未返回的 id 会保留当前值。';
+  renderTips();
+}
+
+/* 切方向等于换了一整套方案：历史序列、极值、告警全部重置，
+   否则会出现「拉萨的方案上挂着上海的历史价格」这种串味。 */
+function switchDirection(dir){
+  if(!P.isDirection(dir) || dir === state.direction) return;
+  state.direction = dir;
+  store('sl_direction', dir);
+  initRoutes();
+  state.history = {};
+  state.prevPrice = {};
+  state.basePrice = {};
+  state.minSeen = {};
+  state.alerted = {};
+  resetToTargets();
+  applyDirection();
+  render();
+  initMap();                    // 起终点标记要跟着翻
 }
 
 function initDate(){
@@ -1597,19 +1855,36 @@ function esc(s){
 }
 
 /* ---------- 价格 × 出行日期 折线图 ---------- */
-var DATE_SERIES = [
-  { id:'air-direct',      color:'#1163a8', on:true  },
-  { id:'air-xian',        color:'#5b9bd5', on:false },
-  { id:'air-chengdu',     color:'#2f9e6f', on:false },
-  { id:'air-ct-transfer', color:'#c47a12', on:true  },
-  { id:'air-cq-transfer', color:'#b8394a', on:true  },
-  { id:'air-xn-rail',     color:'#8a5cd6', on:true  },
-  { id:'train-z164-soft', color:'#0e8a86', on:false },
-  { id:'train-z164-hard', color:'#6a9c3d', on:true  },
-  { id:'train-z164-seat', color:'#a0783c', on:true  },
-  { id:'train-transfer',  color:'#7a8598', on:false }
-];
+/* 配色与默认开关按「基础 id」存放：去掉 -back 后缀、把 Z166 归一到 Z164，
+   这样两个方向共用同一张配色表，返程不会出现某个方案没有颜色。
+   默认开关也按方向各自重置 —— 换方向等于换了一套曲线。 */
+var SERIES_STYLE = {
+  'air-direct':      { color:'#1163a8', on:true  },
+  'air-xian':        { color:'#5b9bd5', on:false },
+  'air-chengdu':     { color:'#2f9e6f', on:false },
+  'air-ct-transfer': { color:'#c47a12', on:true  },
+  'air-cq-transfer': { color:'#b8394a', on:true  },
+  'air-xn-rail':     { color:'#8a5cd6', on:true  },
+  'train-z164-soft': { color:'#0e8a86', on:false },
+  'train-z164-hard': { color:'#6a9c3d', on:true  },
+  'train-z164-seat': { color:'#a0783c', on:true  },
+  'train-transfer':  { color:'#7a8598', on:false }
+};
+var DATE_SERIES = [];
 var dateGeo = null;   // 供 hover 换算坐标用
+
+function seriesKey(id){
+  return String(id).replace(/-back$/, '').replace(/z166/g, 'z164');
+}
+
+/* 系列表必须跟着方向重建：返程 id 全带 -back 后缀，
+   沿用去程那张表会一条曲线都匹配不到，折线图直接空掉。 */
+function buildDateSeries(){
+  DATE_SERIES = state.routes.map(function(r){
+    var st = SERIES_STYLE[seriesKey(r.id)] || { color:'#7a8598', on:false };
+    return { id: r.id, color: st.color, on: st.on };
+  });
+}
 
 function dateSeriesData(now){
   var base = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -1873,37 +2148,55 @@ function renderTable(list){
 
 /* ---------- 提示 ---------- */
 function renderTips(){
+  var back = state.direction === 'back';
   var tips = [
-    { i:'⛰️', h:'高原反应：怎么走最稳', p:[
+    { i:'⛰️', h:'高原反应：怎么走最稳', p: back ? [
+      '<b>火车 / 空铁联运 &gt; 直飞。</b>Z166 出藏 45 小时，海拔从 3650 米一路降到 4 米，身体有充足时间过渡；先坐火车到西宁再飞回同样平缓，不容易出现「下了高原就昏沉」的醉氧反应。',
+      '<b>直飞当天就回到 4 米</b>，血氧快速回升，部分人反而会困倦嗜睡，抵达当天同样别安排剧烈活动。'
+    ] : [
       '<b>火车 / 空铁联运 &gt; 直飞。</b>Z164 直达 45 小时，海拔从 4 米一路爬到 3650 米，身体有充足时间适应；飞西宁再转火车同样渐进，是最稳妥的组合。',
       '<b>直飞落地即 3650 米</b>，抵达当天不要洗澡、不要剧烈活动，先睡一觉。建议首日只安排休息。'
     ]},
     { i:'🎫', h:'购票时机与价格规律', p:[
       '<b>提前 15–28 天</b>是最佳窗口，过早特价未放、过晚价格飞涨。',
       '<b>周二、周三出发最便宜</b>，比周五周日低 15%–30%；早 8 点前或晚 21 点后的航班再便宜 200–300 元。',
-      '<b>但便宜的班次往往就是阴间时段</b>：红眼航班凌晨落地、末班机 22 点后才到拉萨，海拔 3650 米当天很难睡好。页面默认开启「避开阴间时段」，只在这些班次之外取最低价；想看看能省多少，把开关关掉即可对比。',
+      '<b>但便宜的班次往往就是阴间时段</b>：' +
+        (back ? '深夜从拉萨起飞、或凌晨才落地上海，第二天还要上班，同样吃不消'
+              : '红眼航班凌晨落地、末班机 22 点后才到拉萨，海拔 3650 米当天很难睡好') +
+        '。页面默认开启「避开阴间时段」，只在这些班次之外取最低价；想看看能省多少，把开关关掉即可对比。',
       '燃油附加费自 2026 年 8 月 5 日起，800 公里以上航段降至 <b>70 元/人/航段</b>。'
     ]},
-    { i:'✈️', h:'中转为什么便宜一半', p:[
+    { i:'✈️', h:'中转为什么便宜一半', p: back ? [
+      '拉萨直飞上海旺季常要 2000 元以上，<b>经成都 / 重庆中转单程可压到 900–1400 元</b>。',
+      '关键技巧：<b>分段购票</b>（先买拉萨→成都，再买成都→上海）通常比联程票便宜约 200 元。',
+      '代价是两段票不联程，前段延误后段不保，且要自行提取行李重新托运。'
+    ] : [
       '上海直飞拉萨旺季常要 2000 元以上，<b>经成都 / 重庆中转单程可压到 900–1300 元</b>。',
       '关键技巧：<b>分段购票</b>（先买上海→成都，再买成都→拉萨）通常比联程票便宜约 200 元。',
       '代价是两段票不联程，前段延误后段不保，且要自行提取行李重新托运。'
     ]},
-    { i:'🚂', h:'火车票的确定性', p:[
+    { i:'🚂', h:'火车票的确定性', p: back ? [
+      'Z166/Z163 拉萨站 12:45 始发，第三日 09:48 抵达上海，全程 <b>4372 公里 / 45 小时 03 分</b>。',
+      '硬座 402.5 / 硬卧 793.5–841.5 / 软卧 1262.5–1310.5 元，<b>票价固定，不受旺季涨价影响</b>。',
+      '注意：出藏方向放票量比进藏更少，旺季常常开售即空，建议提前 15 天蹲点抢票。'
+    ] : [
       'Z164/Z165 上海站 18:33 始发，第三日 15:36 抵达拉萨，全程 <b>4372 公里 / 45 小时 03 分</b>。',
       '硬座 402.5 / 硬卧 793.5–841.5 / 软卧 1262.5–1310.5 元，<b>票价固定，不受旺季涨价影响</b>。',
       '注意：硬座 45 小时叠加高海拔非常消耗体力，首次进藏不建议。'
     ]},
     { i:'📋', h:'证件与落地', p:[
       '内地居民凭身份证即可；港澳同胞需回乡证，台湾同胞与外籍人士须通过旅行社办理<b>入藏函</b>，通常需提前 10 天。',
-      '拉萨贡嘎机场距市区约 62 公里，机场大巴约 30 元、车程 1 小时。'
+      back
+        ? '拉萨贡嘎机场距市区约 62 公里，机场大巴约 30 元、车程 1 小时；出港航班集中在上午，建议提前 2.5 小时到机场。'
+        : '拉萨贡嘎机场距市区约 62 公里，机场大巴约 30 元、车程 1 小时。'
     ]},
     { i:'🗓️', h:'什么时候去最划算', p:[
-      '<b>4–10 月</b>是进藏最佳季节，天气稳定、航班密集。',
+      '<b>4–10 月</b>是' + (back ? '出藏' : '进藏') + '最佳季节，天气稳定、航班密集。',
       '<b>7–8 月暑假和国庆是全年最贵</b>，机票可上浮 30%；11 月至次年 3 月淡季票价最低，但部分航线会减班。'
     ]}
   ];
   var box = $('#tips');
+  if(!box) return;
   box.innerHTML = tips.map(function(t){
     return '<div class="tip"><h3><em>' + t.i + '</em>' + t.h + '</h3>' +
       t.p.map(function(x){ return '<p>' + x + '</p>'; }).join('') + '</div>';
@@ -1930,11 +2223,26 @@ var NODES = {
   lxa:  [29.298,  90.911, '拉萨贡嘎 LXA'],
   lsz:  [29.660,  91.132, '拉萨站']
 };
-var LINES = [
+var LINES_OUT = [
   { name:'沪蓉走廊（中转）', color:'#1163a8', path:['sha','tf','lxa'] },
   { name:'沪—西宁空铁联运', color:'#c47a12', path:['sha','xnn','xn','lsz'] },
   { name:'沪—拉直达铁路', color:'#0e8a86', path:['shz','nj','xz','zz','xa','lz','xn','gem','nq','lsz'] }
 ];
+var LINES_BACK = [
+  { name:'拉蓉走廊（中转）', color:'#1163a8', path:['lxa','tf','sha'] },
+  { name:'拉—西宁空铁联运', color:'#c47a12', path:['lsz','xn','xnn','sha'] },
+  { name:'拉—沪直达铁路', color:'#0e8a86', path:['lsz','nq','gem','xn','lz','xa','zz','xz','nj','shz'] }
+];
+/* 走廊几何完全相同，方向只影响走向与图例文字。
+   配色语义固定：起点蓝、终点青，返程时起点换成拉萨。 */
+function linesFor(dir){ return dir === 'back' ? LINES_BACK : LINES_OUT; }
+function isShanghaiNode(k){ return k === 'pvg' || k === 'sha' || k === 'shz'; }
+function isLhasaNode(k){ return k === 'lxa' || k === 'lsz'; }
+function nodeRole(k, dir){
+  var sh = isShanghaiNode(k), lh = isLhasaNode(k);
+  if(!sh && !lh) return 'mid';                    // 成都 / 西安 / 西宁等一律中间点
+  return dir === 'back' ? (lh ? 'start' : 'end') : (sh ? 'start' : 'end');
+}
 
 /* 腾讯地图 GL JS 通过 WorkBuddy 本地代理取 key，只在本地预览环境可用。
    页面被发布到公网后代理不可达，SDK 会画出灰底而不是报错，反而更难看，
@@ -1943,6 +2251,7 @@ function mapProxyAvailable(){
   var h = location.hostname;
   return h === '127.0.0.1' || h === 'localhost' || h === '';
 }
+var tmapInstance = null;              // 腾讯地图实例；换方向要先销毁再重建
 function initMap(){
   if(!mapProxyAvailable()){ renderFallbackMap(); return; }
   var tries = 0;
@@ -1955,11 +2264,15 @@ function initMap(){
     }
     var el = $('#map');
     try{
+      /* TMap 实例不能在同一节点上重复构造，换方向前先销毁 */
+      if(tmapInstance){ try{ tmapInstance.destroy(); }catch(e2){} tmapInstance = null; }
       var map = new TMap.Map(el, {
         zoom: 4,
         center: new TMap.LatLng(32.5, 108.5),
         baseMap: { type:'vector' }
       });
+      tmapInstance = map;
+      var LINES = linesFor(state.direction);
       var polyStyles = {
         default: new TMap.PolylineStyle({ color:'#1163a8', width:4, lineCap:'round' })
       };
@@ -1993,7 +2306,7 @@ function initMap(){
         geometries: keys.map(function(k, i){
           return {
             id:'m' + i,
-            styleId: (k === 'lxa' || k === 'lsz') ? 'end' : (k === 'pvg' || k === 'sha' || k === 'shz') ? 'start' : 'mid',
+            styleId: nodeRole(k, state.direction),
             position: new TMap.LatLng(NODES[k][0], NODES[k][1]),
             properties: { title: NODES[k][2] }
           };
@@ -2015,6 +2328,7 @@ function renderFallbackMap(){
   var hint = $('#mapHint');
   if(hint) hint.textContent = mapProxyAvailable() ? '腾讯地图不可用 · 示意图' : '走廊示意图';
 
+  var LINES = linesFor(state.direction);
   var W = Math.max(260, Math.round(host.clientWidth) || 660);
   var narrow = W < 430;
   var padL = 14, padR = 14, padT = 16;
@@ -2063,10 +2377,9 @@ function renderFallbackMap(){
   var ALL = ['pvg','sha','shz','tf','ckg','xnn','xn','lsz','lxa'];
   ALL.forEach(function(k){
     var c = xy(k);
-    var isEnd = (k === 'lxa' || k === 'lsz');
-    var isStart = (k === 'pvg' || k === 'sha' || k === 'shz');
-    var col = isEnd ? '#0e8a86' : isStart ? '#1163a8' : '#c47a12';
-    var r = isEnd ? 6.5 : isStart ? 5.5 : 4;
+    var role = nodeRole(k, state.direction);
+    var col = role === 'end' ? '#0e8a86' : role === 'start' ? '#1163a8' : '#c47a12';
+    var r = role === 'end' ? 6.5 : role === 'start' ? 5.5 : 4;
     s += '<circle cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="' + r +
          '" fill="' + col + '" stroke="#fff" stroke-width="2"/>';
   });
@@ -2128,6 +2441,15 @@ function bind(){
     store('sl_travelDate', this.value);
     resetToTargets();
     render();
+  });
+
+  /* 去程 / 返程切换 */
+  on('#dirSeg', 'click', function(e){
+    var b = e.target.closest('button'); if(!b) return;
+    var v = b.dataset.v;
+    if(!P.isDirection(v) || v === state.direction) return;
+    $$('#dirSeg button').forEach(function(x){ x.classList.toggle('on', x === b); });
+    switchDirection(v);
   });
 
   on('#avoidBad', 'change', function(){
@@ -2295,6 +2617,9 @@ setInterval(function(){
 
 /* ---------- 启动 ---------- */
 function boot(){
+  var sd = store('sl_direction');
+  if(P.isDirection(sd)) state.direction = sd;
+  $$('#dirSeg button').forEach(function(x){ x.classList.toggle('on', x.dataset.v === state.direction); });
   initRoutes();
   initDate();
   var sm = store('sl_srcMode'); if(sm === 'live' || sm === 'demo') state.source.mode = sm;
@@ -2317,7 +2642,7 @@ function boot(){
   seedAll(now);
   state.lastUpdate = now.getTime();
 
-  renderTips();
+  applyDirection();                 // 标题 / 地图说明 / 页脚 / 提示卡都随方向走
   render();
   /* 绑定与地图各自兜底：任一步失败都不该让已渲染的内容白屏 */
   try{ bind(); }catch(e){ if(window.console) console.warn('事件绑定异常：', e); }
@@ -2328,7 +2653,8 @@ if(document.readyState === 'loading') document.addEventListener('DOMContentLoade
 else boot();
 
 /* 暴露给测试/调试 */
-window.__SL = { state: state, render: render, tick: tick, refresh: refresh, P: P };
+window.__SL = { state: state, render: render, tick: tick, refresh: refresh, P: P,
+  applyDirection: applyDirection, switchDirection: switchDirection };
 })();
 /* ==== UI_END ==== */
 </script>

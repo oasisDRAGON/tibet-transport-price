@@ -426,6 +426,122 @@ ok(P.modeLabel('other') === '其他', 'modeLabel 兜底');
   ok(s1.length === 30 && s2.length === 30, '带系数的序列长度不变');
 }
 
+/* ---------- 19. 返程方向（拉萨 → 上海） ---------- */
+
+{
+  // 方向 API
+  ok(P.routesFor('out') === P.ROUTES, 'routesFor(out) 应返回去程数据');
+  ok(P.routesFor('back') === P.ROUTES_BACK, 'routesFor(back) 应返回返程数据');
+  ok(P.routesFor(undefined) === P.ROUTES, 'routesFor(undefined) 退回去程');
+  ok(P.routesFor('xxx') === P.ROUTES, '非法方向退回去程');
+  ok(P.isDirection('out') && P.isDirection('back'), 'isDirection 认得两个合法值');
+  ok(!P.isDirection('') && !P.isDirection(null) && !P.isDirection('OUT'),
+     'isDirection 拒绝空值 / 大小写不符');
+
+  ok(P.directionOf('back').kind === '出藏', '返程方向词应为「出藏」');
+  ok(P.directionOf('out').kind === '进藏', '去程方向词应为「进藏」');
+  ok(P.directionOf('zzz').key === 'out', '非法方向退回 directionOf(out)');
+  ok(P.directionOf('back').from === '拉萨' && P.directionOf('back').to === '上海',
+     '返程起终点应为 拉萨 → 上海');
+
+  // 返程数据完整性
+  ok(P.ROUTES_BACK.length === P.ROUTES.length,
+     '返程方案数应与去程一致，实际 ' + P.ROUTES_BACK.length);
+
+  const backIds = P.ROUTES_BACK.map(r => r.id);
+  ok(new Set(backIds).size === backIds.length, '返程方案 id 不应重复');
+  const outIdSet = new Set(P.ROUTES.map(r => r.id));
+  ok(backIds.every(id => !outIdSet.has(id)),
+     '返程 id 不应与去程撞车（数据源是按 id 取价的）');
+
+  P.ROUTES_BACK.forEach(r => {
+    ['id', 'mode', 'name', 'path', 'schedule', 'clock', 'durationMin',
+     'basePrice', 'range', 'unit', 'stops', 'note', 'pros', 'cons'].forEach(f => {
+      ok(r[f] !== undefined && r[f] !== null && r[f] !== '', r.id + ' 缺少字段 ' + f);
+    });
+    ok(Array.isArray(r.pros) && r.pros.length > 0, r.id + ' pros 应非空');
+    ok(Array.isArray(r.cons) && r.cons.length > 0, r.id + ' cons 应非空');
+    ok(Array.isArray(r.slots) && r.slots.length > 0, r.id + ' 应有班次数据');
+    ok(r.range[0] <= r.basePrice && r.basePrice <= r.range[1], r.id + ' basePrice 应落在 range 内');
+    ok(r.range[0] <= r.range[1], r.id + ' range 上下限反了');
+    ok(r.durationMin > 0, r.id + ' 时长应为正');
+    ok(['flight', 'train', 'combo'].includes(r.mode), r.id + ' mode 非法：' + r.mode);
+    // 火车票价固定，区间应当收成一个点
+    if (r.mode === 'train' && r.id.indexOf('transfer') < 0) {
+      ok(r.range[0] === r.range[1], r.id + ' 火车票价应固定');
+    }
+  });
+
+  // Z166 直达：与 Z164 对开，班次时刻是本方向的核心锚点
+  const z166 = P.ROUTES_BACK.find(r => r.id === 'train-z166-hard');
+  ok(!!z166, '应存在 train-z166-hard');
+  ok(z166.durationMin === 2703, 'Z166 全程应与 Z164 对称（2703 分钟），实际 ' + z166.durationMin);
+  ok(P.clockText(z166.slots[0].dep) === '12:45',
+     'Z166 应 12:45 发车，实际 ' + P.clockText(z166.slots[0].dep));
+  ok(P.clockText(z166.slots[0].arr) === '09:48',
+     'Z166 应第三日 09:48 抵达，实际 ' + P.clockText(z166.slots[0].arr));
+  ok(P.slotArrDayOffset(z166.slots[0]) === 2, 'Z166 抵达应落在第三日');
+
+  // 三种铺位同车次同班期，只有票价不同
+  const zSoft = P.ROUTES_BACK.find(r => r.id === 'train-z166-soft');
+  const zSeat = P.ROUTES_BACK.find(r => r.id === 'train-z166-seat');
+  ok(zSoft.slots[0].dep === z166.slots[0].dep && zSoft.slots[0].arr === z166.slots[0].arr,
+     '软卧 / 硬卧应同一班次');
+  ok(zSeat.slots[0].dep === z166.slots[0].dep, '硬座应与硬卧同班次');
+  ok(zSoft.basePrice > z166.basePrice && z166.basePrice > zSeat.basePrice,
+     '铺位价格应满足 软卧 > 硬卧 > 硬座');
+
+  // 拉萨出港集中在上午（贡嘎午后风大），不能出现下午才起飞的直飞
+  const directBack = P.ROUTES_BACK.find(r => r.id === 'air-direct-back');
+  ok(P.clockText(directBack.slots[0].dep) === '10:20',
+     '贡嘎直飞应上午起飞，实际 ' + P.clockText(directBack.slots[0].dep));
+
+  // 离藏需求集中：返程机票不应比去程便宜
+  P.ROUTES_BACK.forEach(rb => {
+    const ro = P.ROUTES.find(r => r.id === rb.id.replace(/-back$/, ''));
+    if (!ro || ro.mode !== 'flight') return;      // 火车同价，不参与比较
+    ok(rb.basePrice >= ro.basePrice,
+       rb.id + ' 返程票价不应低于去程 ' + ro.basePrice + '，实际 ' + rb.basePrice);
+  });
+
+  // 返程班次同样要过「避开阴间时段」的筛
+  const now2 = new Date(2026, 8, 19);
+  const travel2 = new Date(2026, 11, 10);
+  P.ROUTES_BACK.forEach(r => {
+    const pick = P.pickSlot(r, travel2, now2, true);
+    ok(pick.options.length === r.slots.length, r.id + ' 返程班次选项数应一致');
+    if (pick.best) {
+      ok(!P.isBadSlot(pick.best.slot), r.id + ' 开启筛选后不应选中阴间时段');
+      ok(pick.best.price >= r.range[0] && pick.best.price <= r.range[1],
+         r.id + ' 返程班次价格应在区间内');
+    }
+  });
+
+  // 两个中转方案各有两个红眼班次，验证筛选确实在起作用
+  ['air-ct-transfer-back', 'air-cq-transfer-back'].forEach(id => {
+    const r = P.ROUTES_BACK.find(x => x.id === id);
+    const pick = P.pickSlot(r, travel2, now2, true);
+    ok(pick.excluded === 2, id + ' 应排除 2 个红眼班次，实际 ' + pick.excluded);
+    ok(pick.available === true, id + ' 仍应有可用班次');
+    const all = P.pickSlot(r, travel2, now2, false);
+    ok(all.best.price < pick.best.price,
+       id + ' 关掉筛选后应能拿到更低价，实际 ' + all.best.price + ' vs ' + pick.best.price);
+  });
+
+  // 出藏航班集中在上午，反而没有「全军覆没」的方案
+  const naBack = P.ROUTES_BACK.filter(r => !P.pickSlot(r, travel2, now2, true).best).length;
+  ok(naBack === 0, '返程不应有时段完全不合适的方案，实际 ' + naBack + ' 个');
+
+  // 两个方向不能共用同一份对象，否则改一边会污染另一边
+  ok(P.ROUTES[0] !== P.ROUTES_BACK[0], '两个方向的数据不应是同一份引用');
+
+  // 返程方向的价格序列同样可用
+  const sr = P.priceSeries(P.ROUTES_BACK[0], new Date(2026, 8, 19), 30, now2, 0, 1);
+  ok(sr.length === 30, '返程价格序列应为 30 天');
+  ok(sr.every(x => x.p >= P.ROUTES_BACK[0].range[0] && x.p <= P.ROUTES_BACK[0].range[1]),
+     '返程价格序列应全部落在区间内');
+}
+
 /* ---------- 输出 ---------- */
 console.log('\n通过 ' + pass + ' 项，失败 ' + fail + ' 项');
 if (fail) {

@@ -424,6 +424,113 @@ function step(fn) { return new Promise(r => window.setTimeout(() => { fn(); r();
     ok(chipOf('air-chengdu').classList.contains('na'), '还原后经停成都图例应重新标 na');
   }
 
+  /* ---- 返程查询：方向切换 ---- */
+  {
+    ok(!!$('#dirSeg'), '应存在「行程方向」分段控件');
+    ok($$('#dirSeg button').length === 2, '方向控件应有 2 个按钮');
+    ok($('#dirSeg button.on').dataset.v === 'out', '默认应选中去程');
+
+    // 去程基线
+    const outTitle = $('#heroTitle').textContent.trim();
+    ok(outTitle.includes('上海') && outTitle.includes('拉萨') && outTitle.includes('进藏'),
+       '去程标题应含 上海 / 拉萨 / 进藏，实际 ' + outTitle);
+    ok($('#mapTitle').textContent === '进藏走廊示意', '去程地图标题应为「进藏走廊示意」');
+    ok($('#tipsTitle').textContent === '进藏出行提示', '去程提示标题应为「进藏出行提示」');
+    ok($('#footRailPair').textContent.includes('Z164'), '去程页脚应提到 Z164');
+    ok($('#cards').textContent.includes('浦东直飞贡嘎'), '去程应有「浦东直飞贡嘎」方案');
+    ok($('#mapFallback').innerHTML.includes('沪蓉走廊'), '去程地图图例应为沪蓉走廊');
+
+    const outIds = window.__SL.state.routes.map(r => r.id).join(',');
+    const outCurves = $$('#dateChart polyline').length;
+    ok(outCurves === 6, '去程默认应有 6 条曲线，实际 ' + outCurves);
+
+    /* 切到返程 */
+    $('#dirSeg button[data-v="back"]').dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+    await step(() => {});
+
+    ok(window.__SL.state.direction === 'back', '点击返程后 direction 应为 back');
+    ok($('#dirSeg button.on').dataset.v === 'back', '返程按钮应高亮');
+
+    const backTitle = $('#heroTitle').textContent.trim();
+    ok(backTitle.includes('拉萨') && backTitle.includes('上海') && backTitle.includes('出藏'),
+       '返程标题应含 拉萨 / 上海 / 出藏，实际 ' + backTitle);
+    ok(backTitle.indexOf('拉萨') < backTitle.indexOf('上海'),
+       '返程标题里拉萨应排在上海前面，实际 ' + backTitle);
+
+    ok($('#mapTitle').textContent === '出藏走廊示意', '返程地图标题应为「出藏走廊示意」');
+    ok($('#tipsTitle').textContent === '出藏出行提示', '返程提示标题应为「出藏出行提示」');
+    ok($('#footRailPair').textContent.includes('Z166'), '返程页脚应提到 Z166');
+    ok($('#footRailTrain').textContent === 'Z166', '返程页脚车次应为 Z166');
+    ok($('#footRailLeg').textContent.includes('回沪'), '返程页脚应写「回沪段」');
+
+    // chips 的海拔方向必须反过来
+    const chips = $$('#heroChips .chip').map(c => c.textContent).join(' | ');
+    ok(chips.includes('3650 m → 4 m'), '返程 chips 海拔应写 3650 m → 4 m，实际 ' + chips);
+    ok($$('#heroChips .chip').length === 3, 'chips 应保持 3 个');
+
+    // 整套方案数据换掉
+    ok(window.__SL.state.routes.length === 10, '返程方案应为 10 条');
+    ok($$('#cards .card').length === 10, '返程卡片应为 10 张');
+    ok($$('#tbody tr').length === 10, '返程对比表应为 10 行');
+    const backIds = window.__SL.state.routes.map(r => r.id).join(',');
+    ok(backIds !== outIds, '返程 id 列表应与去程不同');
+    ok(backIds.includes('air-direct-back'), '返程 id 应为 air-direct-back');
+    ok($('#cards').textContent.includes('贡嘎直飞浦东'), '返程应有「贡嘎直飞浦东」方案');
+    ok(!$('#cards').textContent.includes('浦东直飞贡嘎'), '返程不应残留去程方案名');
+
+    // Z166 的时刻要真的落到界面上
+    const backText = $('#cards').textContent + $('#tbody').textContent;
+    ok(backText.includes('12:45'), '返程界面应出现 Z166 的 12:45 发车时刻');
+    ok(backText.includes('09:48'), '返程界面应出现第三日 09:48 抵达');
+
+    // 提示卡与数据源抽屉同步
+    ok($('#tips').textContent.includes('Z166'), '返程提示卡应提到 Z166');
+    ok($('#tips').textContent.includes('出藏'), '返程提示卡应出现「出藏」字样');
+    ok($('#srcIds').textContent.includes('train-z166-hard'), '返程 id 列表应含 train-z166-hard');
+    ok(!$('#srcIds').textContent.includes('train-z164-hard'), '返程 id 列表不应残留去程 id');
+
+    // 地图走廊换成 拉—蓉—沪
+    const backMap = $('#mapFallback').innerHTML;
+    ok(backMap.includes('拉蓉走廊'), '返程地图图例应为拉蓉走廊');
+    ok(!backMap.includes('沪蓉走廊'), '返程地图不应残留沪蓉走廊');
+    ok(backMap.includes('拉—沪直达铁路'), '返程地图应含拉—沪直达铁路');
+
+    // 折线图必须跟着重建 —— 这条最容易漏：系列表按 id 匹配，id 换了就一条线都画不出
+    const backCurves = $$('#dateChart polyline').length;
+    ok(backCurves === 6, '返程默认应有 6 条曲线（系列表已重建），实际 ' + backCurves);
+    ok($$('#dateLegend button').length === 10, '返程图例应有 10 项');
+
+    ok($$('#kpis .kpi').length === 4, '返程 KPI 仍应为 4 个');
+    ok($('#kpis').textContent.length > 10, '返程 KPI 应有内容');
+
+    /* 切回去程，确认能完整还原 */
+    $('#dirSeg button[data-v="out"]').dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+    await step(() => {});
+
+    ok(window.__SL.state.direction === 'out', '切回后 direction 应为 out');
+    ok($('#dirSeg button.on').dataset.v === 'out', '切回后去程按钮应高亮');
+    ok($('#heroTitle').textContent.includes('进藏'), '切回后标题应回到进藏');
+    ok($('#mapTitle').textContent === '进藏走廊示意', '切回后地图标题应还原');
+    ok($('#footRailPair').textContent.includes('Z164'), '切回后页脚应还原为 Z164');
+    ok(window.__SL.state.routes.map(r => r.id).join(',') === outIds, '切回后方案 id 应完全还原');
+    ok($$('#cards .card').length === 10, '切回后卡片仍为 10 张');
+    ok($$('#dateChart polyline').length === 6, '切回后曲线应回到 6 条');
+    ok($('#mapFallback').innerHTML.includes('沪蓉走廊'), '切回后地图应还原为沪蓉走廊');
+
+    // 再点一次「返程」不应重复触发（幂等）
+    $('#dirSeg button[data-v="back"]').dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+    await step(() => {});
+    $('#dirSeg button[data-v="back"]').dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+    await step(() => {});
+    ok(window.__SL.state.direction === 'back', '重复点击返程应保持 back');
+    ok($$('#cards .card').length === 10, '重复点击不应重复渲染出多余卡片');
+
+    // 还原到去程，避免影响后续断言
+    $('#dirSeg button[data-v="out"]').dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+    await step(() => {});
+    ok(window.__SL.state.direction === 'out', '最终应还原为去程');
+  }
+
   /* ---- 无控制台报错 ---- */
   ok(errors.length === 0, '页面不应有未捕获异常：\n      ' + errors.slice(0, 6).join('\n      '));
 
